@@ -5,7 +5,7 @@ const Dishes = require('./models/dishes');
 const url = 'mongodb://127.0.0.1:27017/confusion';
 const connect = mongoose.connect(url);
 
-connect.then((db) =>{
+connect.then(() => {
     console.log('Connect to the Server');
 
     Dishes.create({
@@ -14,12 +14,28 @@ connect.then((db) =>{
     })
     .then((dish) => {
         console.log(dish);
-
-        return Dishes.find({});
+    
+        return Dishes.findByIdAndUpdate(dish._id, {
+            $set : {"description": "Updated test"}
+        }, {
+            new: true
+        })
+        .exec();
     })
-    .then((dishes) => {
-        console.log(dishes);
-
+    .then((dish) => {
+        console.log(dish);
+    
+        dish.comments.push({
+            rating: 5,
+            comment:'i\'m getting a singking feeling!',
+            author: 'Leonardo di Carpaccio'
+        });
+    
+        return dish.save();
+    })
+    .then((dish) =>{
+        console.log(dish)
+    
         return Dishes.remove({});
     })
     .then(() => {
@@ -27,6 +43,6 @@ connect.then((db) =>{
     })
     .catch((err) => {
         console.log(err);
-    })
+    });
 });
 
